@@ -26,6 +26,11 @@
             </tr>
           </tbody>
         </table>
+        <pagination v-if="pagination.last_page > 1"
+              :pagination="pagination"
+              :offset="5"
+              @paginate="getData()"
+              ></pagination>
       </div>
     </div>
     <!-- <ul v-for="mountain in mountains" :key="mountain.slug">
@@ -38,12 +43,19 @@
 </template>
 
 <script>
+import pagination from '../components/PaginationComponent.vue'
 // const axios = require('axios');
 import axios from 'axios'
 export default {
+  components: {
+    pagination,
+  },
   data() {
     return {
       customers: {},
+      pagination: {
+        current_page:1,
+      }
     }
   },
 
@@ -54,9 +66,10 @@ export default {
   methods: {
     getData() {
       axios
-        .get('http://localhost:8000/api/customer')
+        .get('http://localhost:8000/api/customer?page='+this.pagination.current_page)
         .then((response) => {
-          this.customers = response.data
+          this.customers = response.data.data
+           this.pagination = response.data.meta;
           console.log(response.data)
         })
         .catch((e) => {
